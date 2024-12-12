@@ -577,10 +577,11 @@ class DataAnalyzerMarkdown(DataAnalyzer):
         text = ""
         image_paths = [os.path.join(self.filename,file) for file in os.listdir(self.filename) if file.endswith('.png')]
         # Convert images to base64 strings
-        images_base64 = [self.convert_image_to_base64(image_path) for image_path in image_paths]
+        content = ""
+        #images_base64 = [self.convert_image_to_base64(image_path) for image_path in image_paths]
 
         # Combine text with image data
-        content = f"{text}\n\n{' '.join(images_base64)}"
+        #content = f"{text}\n\n{' '.join(images_base64)}"
 
         content = content + " " +self.data_desc + " " + self.data_analysis + " " +self.data_insight
 

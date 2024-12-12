@@ -2,17 +2,17 @@
 
 ## Data Description 
  
-The report contains a dataset of book-related information, encompassing 10,000 rows with various attributes such as book IDs, ratings, and image URLs. Each entry provides details about individual books, including their Goodreads IDs, ISBN numbers, total ratings across different score levels, and corresponding image links for both small and large formats. The dataset appears to be structured to facilitate analysis of book popularity and reader ratings.
+The report contains a dataset with information on books, including fields such as book IDs, ISBN numbers, ratings, and image URLs. It consists of 10,000 rows, encompassing various attributes related to each book's identity and popularity, including metrics for user ratings. This data can be used for analysis of book trends, reader preferences, and overall book popularity.
  
 ## Numerical Columns
 
 The maximum correlations is found between columns ratings_count and work_ratings_count with a value of 0.9950949109767664.The minimum correlation is between columns ratings_2 and average_rating with a value of -0.11433083463802127
 
-Outliers found in column {'isbn13': 556, 'work_text_reviews_count': 1005, 'work_ratings_count': 1143, 'ratings_2': 1156, 'ratings_count': 1163, 'books_count': 844, 'ratings_1': 1140, 'ratings_4': 1131, 'ratings_3': 1149, 'ratings_5': 1158, 'average_rating': 158}
+Outliers found in column {'ratings_2': 1156, 'work_text_reviews_count': 1005, 'ratings_count': 1163, 'average_rating': 158, 'ratings_1': 1140, 'ratings_3': 1149, 'ratings_4': 1131, 'books_count': 844, 'ratings_5': 1158, 'isbn13': 556, 'work_ratings_count': 1143}
 
-The most important features are work_ratings_count, ratings_4 and ratings_3 with feature importances of importance    0.460323
-Name: work_ratings_count, dtype: float64, importance    0.364784
-Name: ratings_4, dtype: float64 and importance    0.059092
+The most important features are ratings_4, work_ratings_count and ratings_3 with feature importances of importance    0.494741
+Name: ratings_4, dtype: float64, importance    0.339257
+Name: work_ratings_count, dtype: float64 and importance    0.053983
 Name: ratings_3, dtype: float64 respectively
 
 ## Text Columns
@@ -23,26 +23,26 @@ The number of unique elements in text columns are      Column Name  Number of Un
 
 ## Data Analysis 
 
-The dataset shows a high correlation (0.995) between ratings_count and work_ratings_count, while the lowest correlation (-0.114) is between ratings_2 and average_rating. Key features identified include work_ratings_count and ratings_4, with significant importances of 0.4288 and 0.4257, respectively. Additionally, outliers were detected in multiple columns, and the text columns have 25 unique language codes and 9,300 unique ISBNs.
+The dataset exhibits a strong correlation (0.995) between the columns ratings_count and work_ratings_count, while the weakest correlation (-0.114) occurs between ratings_2 and average_rating. Key features impacting the dataset include ratings_4, work_ratings_count, and ratings_3, with respective importances of 0.472, 0.332, and 0.079. Additionally, several outliers were identified across multiple rating-related columns, and the text column language_code contains 25 unique elements, while the isbn column has 9,300 unique values.
  
 ## Data Insights 
 
-This dataset presents a rich avenue for exploring book popularity, particularly through its high correlation between ratings_count and work_ratings_count, indicating that books with more ratings tend to receive higher overall ratings. The notable outliers may suggest a need for quality checks or highlight particularly exceptional or poorly received titles, while the uniqueness of languages and ISBNs offers potential for further segmentation and market analysis.
+The dataset reveals a powerful correlation between ratings_count and work_ratings_count, suggesting that these metrics are indicative of each other in assessing book popularity. Notably, while ratings_4 significantly influences overall ratings, the presence of outliers and diverse language codes underscore the complexity of reader preferences and market trends, signaling opportunities for targeted marketing strategies.
  
 ## Data Implications 
 
-The provided dataset of 10,000 books includes key attributes such as book IDs, ratings, and images, allowing for insights into book popularity and reader engagement. The high correlation (0.995) between ratings_count and work_ratings_count suggests that books receiving numerous ratings generally attain higher overall ratings, indicating community validation. Conversely, the negative correlation (-0.114) between ratings_2 and average_rating points to potential distinctions in reader experiences or preferences that could warrant further investigation. Significant features like work_ratings_count and ratings_4 highlight trends in reader feedback. Additionally, the presence of 25 unique language codes and 9,300 unique ISBNs implies potential for in-depth market segmentation. Outliers in ratings could either indicate data quality issues or signify exceptional works. Overall, this dataset offers extensive opportunities for analysis, which could enhance understanding of consumer behavior in the book market.
+The dataset on books reveals significant insights into reader preferences and market trends. With 10,000 entries, the strong correlation (0.995) between ratings_count and work_ratings_count indicates that these metrics are key indicators of a book's popularity, suggesting that higher user engagement correlates with higher ratings. Key features influencing ratings include ratings_4, work_ratings_count, and ratings_3, with ratings_4 being the most impactful. However, the presence of outliers in rating-related columns hints at inconsistencies in reader assessments, indicating a need for further investigation into these anomalies. Moreover, the diversity in language codes (25 unique elements) and ISBN numbers (9,300 unique values) highlights the global reach and multifaceted nature of book readership. This complexity offers an opportunity for targeted marketing strategies based on specific reader demographics and preferences, allowing publishers and marketers to tailor their approaches effectively to enhance engagement and sales.
 
 ## Visualizations
 
-![Cluster_visualization.png](/goodreads\Cluster_visualization.png)
+![Cluster_visualization.png](/goodreads/Cluster_visualization.png)
 
-![Column_Visualization_count.png](/goodreads\Column_Visualization_count.png)
+![Column_Visualization_count.png](/goodreads/Column_Visualization_count.png)
 
-![Column_Visualization_mean.png](/goodreads\Column_Visualization_mean.png)
+![Column_Visualization_mean.png](/goodreads/Column_Visualization_mean.png)
 
-![correlation_graph.png](/goodreads\correlation_graph.png)
+![correlation_graph.png](/goodreads/correlation_graph.png)
 
-![outlier_boxplots.png](/goodreads\outlier_boxplots.png)
+![outlier_boxplots.png](/goodreads/outlier_boxplots.png)
 
 

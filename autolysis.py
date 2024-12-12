@@ -646,7 +646,7 @@ class DataAnalyzerMarkdown(DataAnalyzer):
             for image_file in image_files:
                 image_path = os.path.join(self.filename, image_file)
                 if os.path.exists(image_path):
-                    f.write(f'![{image_file}](/{image_path})' +'\n\n')
+                    f.write(f'![{image_file}](/{self.filename}/{image_file})' +'\n\n')
             f.write('\n')
             f.close()
 load_dotenv(find_dotenv())
