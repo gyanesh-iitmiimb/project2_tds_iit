@@ -32,18 +32,34 @@ import os
 from datetime import datetime, timedelta
 import sys
 import base64
-load_dotenv(find_dotenv())
-endpoint = "https://aiproxy.sanand.workers.dev/openai/"
-api_key = os.getenv("OPENAI_API_KEY")
-api_base = endpoint + "v1/chat/completions"
-
-if len(sys.argv) != 2:
-    print("Usage: python autolysis.py <file_path>")
-    sys.exit(1)
-file_path = sys.argv[1]
 
 
 class DataAnalyzer:
+    """
+    DataAnalyzer is a class for analyzing CSV files and generating insights and visualizations.
+
+    Parameters
+    ----------
+    dataframe_path : str
+        The path to the CSV file to be analyzed.
+
+    Attributes
+    ----------
+    dataframe_path : str
+        The path to the CSV file to be analyzed.
+    date_cols : List[str]
+        The columns that contain date data.
+    link_cols : List[str]
+        The columns that contain links.
+    word_cols : List[str]
+        The columns that contain word data.
+    numeric_cols : List[str]
+        The columns that contain numeric data.
+    text_cols : List[str]
+        The columns that contain text data.
+    df : pandas.DataFrame
+        The DataFrame object of the CSV file.
+    """
     def __init__(self, dataframe_path=None):
         """
         Initialize a DataAnalyzer instance.
@@ -435,7 +451,28 @@ class DataAnalyzerMarkdown(DataAnalyzer):
     api_key : str
         The OpenAI API key.
     """
-    def __init__(self, file_path,api_base,api_key):
+    def __init__(self, file_path, api_base, api_key):
+        """
+        Initialize a DataAnalyzerMarkdown instance.
+
+        Parameters
+        ----------
+        file_path : str
+            The path to the CSV file to be analyzed.
+        api_base : str
+            The base URL of the OpenAI API.
+        api_key : str
+            The OpenAI API key.
+
+        Attributes
+        ----------
+        md_filename : str
+            The path to the Markdown file to be written.
+        api_base : str
+            The base URL of the OpenAI API.
+        api_key : str
+            The OpenAI API key.
+        """
         super().__init__(file_path)
         self.md_filename = os.path.join(self.filename, 'README.md')
         self.api_base = api_base
@@ -470,20 +507,60 @@ class DataAnalyzerMarkdown(DataAnalyzer):
         return messages["choices"][0]["message"]["content"]
 
     def brief_data_description(self):
-        return self.chat_completion(context="Briefly describe the data in this report. Be precise in 2-3 sentences. Give a generalised answer the data passed is just an example subset"
+        """
+        Generate a brief description of the data in this report.
+
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        str
+            A brief description of the data in 2-3 sentences.
+        """
+        self.data_desc = self.chat_completion(context="Briefly describe the data in this report. Be precise in 2-3 sentences. Give a generalised answer the data passed is just an example subset"
                                             f"be generic in your answer, as data contains {len(self.df)} rows",
                                     content=f"{self.df.head(1)}")
+        return self.data_desc
+
     def explain_data_analysis(self):
-        return self.chat_completion(context= "You are given few sentences about the data set, summarise those in 2 to 3 lines.",
+        """
+        Summarize the data analysis in 2-3 lines.
+
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        str
+            A summary of the data analysis in 2-3 lines.
+        """
+        self.data_analysis = self.chat_completion(context= "You are given few sentences about the data set, summarise those in 2 to 3 lines.",
                                     content = (f"{self.numerical_cols_analyze_correlations()[0]} " +
                                                         f"{self.numerical_cols_analyze_cluster()[0]} " +
                                                         f"{self.numerical_cols_analyze_outliers()[0]} " +
                                                         f"{self.text_word_analyzer()[0]}"))
+        return self.data_analysis
 
     def explain_data_insights(self):
-        return self.chat_completion(context= "You are a good data scientist, given few summaries of the data and data analysis. Generate dood insights"
+        """
+        Generate insights from the data and data analysis in 2-3 lines.
+
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        str
+            Insights from the data and data analysis in 2-3 lines.
+        """
+        self.data_insight = self.chat_completion(context= "You are a good data scientist, given few summaries of the data and data analysis. Generate dood insights"
                                              "in about two to three lines",
-                                    content = (f"{self.brief_data_description()}" + " " + f"{self.explain_data_analysis()}" ))
+                                    content = (f"{self.data_desc}" + " " + f"{self.data_analysis}" ))
+        return self.data_insight
 
     def analyze_implications_with_images(self):
         """
@@ -505,9 +582,13 @@ class DataAnalyzerMarkdown(DataAnalyzer):
         # Combine text with image data
         content = f"{text}\n\n{' '.join(images_base64)}"
 
+        content = content + " " +self.data_desc + " " + self.data_analysis + " " +self.data_insight
+
+
         # Use chat_completion to analyze implications
         return self.chat_completion(
-            context="You are a data scientist. Analyze the given text and images to identify key implications.",
+            context="You are a data scientist. Analyze the given text and images to identify key implications."
+                    "Be crisp and deliver a short paragraph, try to contain under 300 words",
             content=content
         )
 
@@ -532,16 +613,27 @@ class DataAnalyzerMarkdown(DataAnalyzer):
 
 
     def write_report_md(self):
+        """
+        Write the report to a markdown file.
+
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        None
+        """
         with open(self.md_filename, 'w') as f:
             f.write('# Report\n\n')
             f.write('## Data Description \n \n')
             f.write(self.brief_data_description() + '\n \n')
             f.write('## Numerical Columns\n\n')
-            f.write(self.numerical_cols_analyze_correlations() + '\n\n')
-            f.write(self.numerical_cols_analyze_outliers() + '\n\n')
-            f.write(self.numerical_cols_analyze_cluster() + '\n\n')
+            f.write(self.numerical_cols_analyze_correlations()[0] + '\n\n')
+            f.write(self.numerical_cols_analyze_outliers()[0] + '\n\n')
+            f.write(self.numerical_cols_analyze_cluster()[0] + '\n\n')
             f.write('## Text Columns\n\n')
-            f.write(self.text_word_analyzer() + '\n\n')
+            f.write(self.text_word_analyzer()[0] + '\n\n')
             f.write ('## Data Analysis \n\n')
             f.write (self.explain_data_analysis() + '\n \n')
             f.write ('## Data Insights \n\n')
@@ -553,12 +645,18 @@ class DataAnalyzerMarkdown(DataAnalyzer):
             for image_file in image_files:
                 image_path = os.path.join(self.filename, image_file)
                 if os.path.exists(image_path):
-                    f.write(f'![{image_file}]({image_path})\n\n')
+                    f.write(f'![{image_file}](/{image_path})' +'\n\n')
             f.write('\n')
             f.close()
+load_dotenv(find_dotenv())
+endpoint = "https://aiproxy.sanand.workers.dev/openai/"
+api_key = os.getenv("OPENAI_API_KEY")
+api_base = endpoint + "v1/chat/completions"
 
-
-
+if len(sys.argv) != 2:
+    print("Usage: python autolysis.py <file_path>")
+    sys.exit(1)
+file_path = sys.argv[1]
 df = DataAnalyzer(file_path)
 df.identify_link_or_word_columns()
 df.identify_date_columns_and_create_timestamp()
@@ -569,5 +667,3 @@ df.text_word_analyzer()
 df.create_visualisations()
 md = DataAnalyzerMarkdown(file_path = file_path,api_base =api_base, api_key=api_key)
 md.write_report_md()
-
-
