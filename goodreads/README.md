@@ -2,18 +2,18 @@
 
 ## Data Description 
  
-The data in this report includes a subset of a larger dataset containing information about books, specifically focusing on attributes such as book IDs, ISBNs, ratings, and image URLs. It comprises 10,000 rows of data, capturing various metrics related to each book's performance and accessibility on platforms like Goodreads, including the count of ratings at different levels.
+The data in this report comprises a dataset with 10,000 rows, detailing various attributes of books, including identifiers such as book_id and goodreads_book_id, as well as physical details like ISBN and book counts. It also includes user ratings across different scales (1 to 5 stars) and URL links to book images, providing a comprehensive overview for analysis within a book collection or a reading platform.
  
 ## Numerical Columns
 
 The maximum correlations is found between columns ratings_count and work_ratings_count with a value of 0.9950949109767664.The minimum correlation is between columns average_rating and ratings_2 with a value of -0.11433083463802127
 
-Outliers found in column {'isbn13': 556, 'average_rating': 158, 'ratings_5': 1158, 'work_text_reviews_count': 1005, 'ratings_2': 1156, 'ratings_1': 1140, 'ratings_3': 1149, 'work_ratings_count': 1143, 'ratings_count': 1163, 'books_count': 844, 'ratings_4': 1131}
+Outliers found in column {'ratings_5': 1158, 'ratings_count': 1163, 'books_count': 844, 'isbn13': 556, 'ratings_1': 1140, 'ratings_3': 1149, 'work_ratings_count': 1143, 'ratings_2': 1156, 'ratings_4': 1131, 'work_text_reviews_count': 1005, 'average_rating': 158}
 
-The most important features are ratings_4, work_ratings_count and ratings_3 with feature importances of importance    0.450084
-Name: ratings_4, dtype: float64, importance    0.384857
-Name: work_ratings_count, dtype: float64 and importance    0.051947
-Name: ratings_3, dtype: float64 respectively
+The most important features are ratings_4, work_ratings_count and books_count with feature importances of importance    0.471013
+Name: ratings_4, dtype: float64, importance    0.391355
+Name: work_ratings_count, dtype: float64 and importance    0.045832
+Name: books_count, dtype: float64 respectively
 
 ## Text Columns
 
@@ -23,15 +23,15 @@ The number of unique elements in text columns are      Column Name  Number of Un
 
 ## Data Analysis 
 
-The dataset reveals a strong correlation (0.995) between ratings_count and work_ratings_count, while the lowest correlation (-0.114) is between average_rating and ratings_2. The key features identified are ratings_4, work_ratings_count, and ratings_3, with importances of 0.44006, 0.326958, and 0.119436 respectively. Additionally, there are notable outliers in various rating columns, and the text columns have a limited number of unique entries, specifically with 25 unique language codes and 9300 ISBNs.
+The dataset shows a strong correlation of 0.995 between ratings_count and work_ratings_count, while the weakest correlation is -0.114 between average_rating and ratings_2. Key features identified include ratings_4, work_ratings_count, and ratings_3, with respective importances of 0.419, 0.397, and 0.068. Additionally, several outliers are present in columns like ratings_5 and average_rating, and the text columns have varying unique element counts, with 25 unique language codes and 9300 unique ISBNs.
  
 ## Data Insights 
 
-The dataset highlights a significant dependency between overall ratings and work-specific ratings, suggesting that a high volume of ratings typically mirrors a book's popularity. However, the weak correlation between average ratings and lower ratings indicates that while many books might receive numerous reviews, they don’t always achieve high average satisfaction. The identified key features for performance metrics can guide targeted marketing strategies to enhance reader engagement.
+The dataset offers a rich landscape for exploring book popularity, with ratings_4 and work_ratings_count being key indicators of a book's reception. The strong correlation between ratings_count and work_ratings_count suggests that a higher count of reviews directly enhances a book's visibility and perceived quality. However, the presence of outliers in ratings_5 may indicate that some books are exceptionally well-received, warranting further investigation into what distinguishes them from the rest.
  
 ## Data Implications 
 
-The dataset analyzed consists of information on approximately 10,000 books, focusing on various performance metrics like ratings and accessibility on platforms such as Goodreads. It exhibits a strong positive correlation (0.995) between the total number of ratings and work-specific ratings, suggesting that books receiving more ratings tend to achieve greater popularity. Conversely, the weak negative correlation (-0.114) between average rating and the number of lower ratings indicates that high volume does not necessarily equate to high average satisfaction. Key features affecting performance include ratings at the four-star level, total work ratings, and three-star ratings, with respective importances highlighting their influence on a book’s success. The presence of notable outliers and a limited number of unique entries in some text columns, such as language codes and ISBNs, also signify the need for focused marketing strategies. In summary, while the correlation data and key features provide insights into reader engagement and book performance, the dataset also highlights potential areas for improvement in average satisfaction. This analysis suggests that while popularity (as indicated by ratings count) is essential, ensuring quality ratings is crucial for overall success in the competitive book market.
+The dataset under analysis represents a broad collection of books, totaling 10,000 entries, featuring attributes such as identifiers, user ratings, and physical details. Notably, a strong correlation of 0.995 between ratings_count and work_ratings_count indicates that a higher volume of reviews correlates strongly with increased visibility and improved perceived quality of a book. The analysis identifies key features, with ratings_4 and work_ratings_count emerging as significant factors in determining a book's reception, reflected in their respective importances of 0.419 and 0.397. However, outliers observed in the ratings_5 column suggest a subset of books that are exceptionally well-received, prompting a need to explore what specifically contributes to their distinction from other works. Furthermore, with 9300 unique ISBNs and a varied distribution of language codes, the dataset provides ample opportunity for deeper exploration into trends in book popularity and user engagement across different demographics. Overall, the findings point towards a complex interplay of factors influencing book ratings, emphasizing the importance of high review counts and the intriguing outliers that merit further qualitative examination.
 
 ## Visualizations
 

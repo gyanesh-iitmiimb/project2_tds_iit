@@ -29,7 +29,6 @@ import requests
 import json
 from dotenv import load_dotenv, find_dotenv
 import os
-from datetime import datetime, timedelta
 import sys
 import base64
 
@@ -51,8 +50,6 @@ class DataAnalyzer:
         The columns that contain date data.
     link_cols : List[str]
         The columns that contain links.
-    word_cols : List[str]
-        The columns that contain word data.
     numeric_cols : List[str]
         The columns that contain numeric data.
     text_cols : List[str]
@@ -105,7 +102,7 @@ class DataAnalyzer:
 
         Parameters
         ----------
-        None
+
 
         Returns
         -------
@@ -283,7 +280,6 @@ class DataAnalyzer:
             x=df[self.numeric_cols]
             rf= RandomForestRegressor()
             rf.fit(x,y)
-            rf.feature_importances_
             feature_importances = pd.DataFrame(rf.feature_importances_, index=x.columns, columns=['importance']).sort_values('importance', ascending=False)
             return (f"The most important features are {feature_importances.index[0]}, {feature_importances.index[1]} and {feature_importances.index[2]} with "
                     f"feature importances of {feature_importances.iloc[0]}, {feature_importances.iloc[1]} and {feature_importances.iloc[2]} respectively",

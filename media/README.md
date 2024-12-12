@@ -2,17 +2,17 @@
 
 ## Data Description 
  
-The report contains a dataset with 2,652 entries detailing information about various media types, specifically focusing on movies in the Tamil language. Each entry includes fields such as date, language, type, title, contributors, and ratings across several criteria including overall rating, quality, and repeatability. The data is organized to provide insights into specific media attributes and user feedback.
+The report contains a dataset with 2652 rows detailing various entries related to media, specifically movies in different languages, along with associated attributes. Each entry includes fields such as date, language, type, title, contributors, and ratings for overall performance, quality, and repeatability. The data captures insights on content released over time, indicating user assessments and preferences.
  
 ## Numerical Columns
 
-The maximum correlations is found between columns quality and overall with a value of 0.8259352331454309.The minimum correlation is between columns repeatability and quality with a value of 0.312126511538864
+The maximum correlations is found between columns quality and overall with a value of 0.8259352331454309.The minimum correlation is between columns quality and repeatability with a value of 0.31212651153886395
 
-Outliers found in column {'overall': 1216, 'quality': 24}
+Outliers found in column {'quality': 24, 'overall': 1216}
 
-The most important features are quality, repeatability and overall with feature importances of importance    0.507573
-Name: quality, dtype: float64, importance    0.311036
-Name: repeatability, dtype: float64 and importance    0.181391
+The most important features are quality, repeatability and overall with feature importances of importance    0.50358
+Name: quality, dtype: float64, importance    0.31316
+Name: repeatability, dtype: float64 and importance    0.18326
 Name: overall, dtype: float64 respectively
 
 ## Text Columns
@@ -24,15 +24,15 @@ The number of unique elements in text columns are   Column Name  Number of Uniqu
 
 ## Data Analysis 
 
-The dataset reveals a strong correlation (0.83) between the 'quality' and 'overall' columns, while the weakest correlation (0.31) is between 'repeatability' and 'quality.' Key features identified include 'quality,' 'repeatability,' and 'overall' with respective importances of 0.50, 0.31, and 0.18. Outliers were detected in 'overall' (1216) and 'quality' (24), while the text columns display various unique elements: 8 for 'type,' 11 for 'language,' and 2055 for 'date.'
+The dataset reveals a strong correlation of 0.83 between the columns 'quality' and 'overall', while a weaker correlation of 0.31 exists between 'quality' and 'repeatability'. Key features identified are 'quality', 'repeatability', and 'overall', with respective importances of 0.50, 0.31, and 0.18. Notable outliers are present in 'quality' and 'overall', and the text columns have various unique elements, such as 8 unique types and 11 unique languages.
  
 ## Data Insights 
 
-The analysis highlights a strong positive correlation between the quality and overall ratings of Tamil movies, suggesting that higher quality typically leads to better audience reception. Conversely, the low correlation between repeatability and quality indicates that well-rated films may not necessarily encourage repeat viewings. The dataset's diversity in dates and types showcases a rich variety of content, yet the presence of notable outliers in overall ratings suggests potential anomalies or standout performances in certain films.
+The dataset reveals a strong relationship between overall performance and quality of movies, suggesting that high-quality content tends to receive better ratings overall. However, the weaker link with repeatability indicates that even quality films may not guarantee viewers will return for more. Unique language and type diversity suggests a rich landscape for movie analysis, opening avenues for targeted content strategies.
  
 ## Data Implications 
 
-The analysis of the dataset containing 2,652 entries about Tamil movies reveals insightful trends and relationships among various media attributes. A significant positive correlation of 0.83 between 'quality' and 'overall' ratings suggests that higher quality movies generally receive better audience reception. However, the weak correlation (0.31) between 'repeatability' and 'quality' indicates that even well-rated films might not encourage repeat viewings, implying factors beyond quality influencing audience loyalty. The dataset also indicates a diverse range of content with notable outliers in both 'overall' (1216) and 'quality' (24) ratings, highlighting exceptional films that may skew average ratings. Unique elements are abundant with 8 recognized types, 11 languages, and substantial variability in release dates (2055). The findings underline the importance of quality in determining overall reception while also noting potential anomalies that deserve further investigation to understand viewer engagement comprehensively.
+The dataset encompassing 2,652 movie entries reflects diverse media content across various languages and genres, highlighting essential attributes such as date, type, title, contributors, and ratings for quality, overall performance, and repeatability. A prominent correlation coefficient of 0.83 between 'quality' and 'overall' ratings suggests that higher-quality films are likely to achieve better overall ratings, illustrating the importance of content quality in viewer assessments. Conversely, the correlation of 0.31 between 'quality' and 'repeatability' implies that while quality is significant, it does not necessarily foster repeated viewings. This indicates potential market opportunities for films that may perform well critically but lack high repeatability, suggesting targeted marketing strategies could enhance audience engagement. Additionally, the presence of eight unique types and eleven unique languages underscores the dataset's richness, opening pathways for more granular audience analysis and tailored content strategies to capitalize on diverse viewer preferences. Notable outliers in quality and overall ratings signal opportunities for further investigation into what influences viewer ratings, paving the way for enhanced content production and marketing efforts.
 
 ## Visualizations
 

@@ -587,11 +587,17 @@ class DataAnalyzerMarkdown(DataAnalyzer):
 
 
         # Use chat_completion to analyze implications
-        return self.chat_completion(
-            context="You are a data scientist. Analyze the given text and images to identify key implications."
-                    "Be crisp and deliver a short paragraph, try to contain under 300 words",
-            content=content
-        )
+        try:
+            return self.chat_completion(
+                context="You are a data scientist. Analyze the given text and images to identify key implications."
+                        "Be crisp and deliver a short paragraph, try to contain under 300 words",
+                content=content
+            )
+        except Exception as e:
+            return self.chat_completion(context="You are a data scientist. Analyze the given text and images to identify key implications."
+                        "Be crisp and deliver a short paragraph, try to contain under 300 words",
+                content=self.data_desc + " " + self.data_analysis + " " +self.data_insight
+            )
 
     def convert_image_to_base64(self, image_path):
         """

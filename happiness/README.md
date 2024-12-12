@@ -2,17 +2,17 @@
 
 ## Data Description 
  
-The report contains data on various well-being indicators across different countries, encompassing 2,363 rows. Each entry includes metrics such as the Life Ladder score, Log GDP per capita, social support, healthy life expectancy, freedom to make life choices, generosity, perceptions of corruption, and positive and negative affect, all categorized by country and year. This data is useful for analyzing the correlation between economic, social, and subjective well-being indicators globally.
+The report contains a dataset with 2,363 rows that includes various socio-economic indicators for different countries across multiple years. Key variables tracked include the Life Ladder score, Log GDP per capita, social support, health indicators, and perceptions of freedom, generosity, and corruption. This data aims to provide insights into the overall well-being and quality of life in various nations.
  
 ## Numerical Columns
 
-The maximum correlations is found between columns Log GDP per capita and Healthy life expectancy at birth with a value of 0.8321419946722857.The minimum correlation is between columns Perceptions of corruption and Freedom to make life choices with a value of -0.4741100714440944
+The maximum correlations is found between columns Healthy life expectancy at birth and Log GDP per capita with a value of 0.8321419946722857.The minimum correlation is between columns Freedom to make life choices and Perceptions of corruption with a value of -0.4741100714440944
 
-Outliers found in column {'Negative affect': 31, 'Social support': 48, 'Healthy life expectancy at birth': 20, 'Life Ladder': 2, 'Freedom to make life choices': 16, 'Log GDP per capita': 1, 'Positive affect': 9, 'Perceptions of corruption': 194, 'Generosity': 39}
+Outliers found in column {'Healthy life expectancy at birth': 20, 'Freedom to make life choices': 16, 'Positive affect': 9, 'Negative affect': 31, 'Perceptions of corruption': 194, 'Life Ladder': 2, 'Generosity': 39, 'Log GDP per capita': 1, 'Social support': 48}
 
-The most important features are Life Ladder, Log GDP per capita and Perceptions of corruption with feature importances of importance    0.558361
-Name: Life Ladder, dtype: float64, importance    0.123434
-Name: Log GDP per capita, dtype: float64 and importance    0.09385
+The most important features are Life Ladder, Log GDP per capita and Perceptions of corruption with feature importances of importance    0.55445
+Name: Life Ladder, dtype: float64, importance    0.118726
+Name: Log GDP per capita, dtype: float64 and importance    0.105856
 Name: Perceptions of corruption, dtype: float64 respectively
 
 ## Text Columns
@@ -21,15 +21,15 @@ No Text Columns Found
 
 ## Data Analysis 
 
-The dataset shows a strong positive correlation (0.83) between Log GDP per capita and Healthy life expectancy at birth, while a negative correlation (-0.47) exists between Perceptions of corruption and Freedom to make life choices. Key features include Life Ladder, Log GDP per capita, and Perceptions of corruption, with respective importances of 56%, 12%, and 10%. Additionally, several outliers were identified across various columns.
+The dataset shows a strong positive correlation (0.83) between Healthy life expectancy at birth and Log GDP per capita, while the weakest negative correlation (-0.47) is between Freedom to make life choices and Perceptions of corruption. Key features impacting the data include Life Ladder, Log GDP per capita, and Perceptions of corruption. Outliers were identified in several columns, with notable values in Healthy life expectancy and Perceptions of corruption.
  
 ## Data Insights 
 
-The dataset reveals a compelling link between economic prosperity and health, with higher GDP per capita significantly correlating to better life expectancy, showcasing the profound impact of wealth on well-being. Conversely, the negative correlation between perceptions of corruption and personal freedom highlights the detrimental effects of corruption on individual autonomy, suggesting that enhancing governance could improve societal well-being. Outlier analysis may uncover unique country experiences, prompting deeper investigation into their distinct socio-economic dynamics.
+The dataset illustrates a strong link between economic prosperity and health, suggesting that higher GDP per capita correlates with better health outcomes. Interestingly, while freedom in life choices appears to be compromised by perceptions of corruption, the outliers in health and corruption metrics indicate potential areas for targeted policy interventions to enhance societal well-being.
  
 ## Data Implications 
 
-The report presents a comprehensive analysis of well-being indicators across 2,363 countries, revealing critical insights into the complex interplay between economic prosperity and individual well-being. Notably, the strong positive correlation (0.83) between Log GDP per capita and healthy life expectancy indicates that wealthier nations tend to foster better health outcomes for their citizens, underscoring the crucial role of economic resources in enhancing life quality. In contrast, the negative correlation (-0.47) between perceptions of corruption and the freedom to make life choices suggests that high levels of corruption can severely restrict individual autonomy, ultimately harming societal well-being. The primary indicators, including the Life Ladder score, Log GDP per capita, and perceptions of corruption, play significant roles in shaping overall life satisfaction, with life ladder importance at 56%. Outlier analysis may provide further insights into unique socio-economic conditions in specific countries, prompting targeted strategies for intervention. Consequently, the data emphasizes the necessity for improved governance and economic strategies to foster overall well-being, highlighting that tackling corruption could significantly enhance personal freedoms and health outcomes.
+The dataset analyzed reveals crucial socio-economic insights across 2,363 countries, spotlighting the intricate relationship between economic prosperity and quality of life indicators. With a significant positive correlation of 0.83 between Healthy life expectancy at birth and Log GDP per capita, it underscores the vital role of economic conditions in influencing health outcomes. Conversely, the negative correlation of -0.47 between Freedom to make life choices and Perceptions of corruption suggests a troubling trend where citizens’ autonomy might be undermined by high corruption levels. The identification of outliers in healthy life expectancy and perceptions of corruption points to specific areas where targeted policy interventions could effectively improve societal well-being, highlighting the need for tailored strategies in governance and health initiatives. Overall, the implications of this dataset suggest a call to action for policymakers to address economic disparities and corruption to foster both health and freedom, thereby enhancing the overall quality of life in diverse nations.
 
 ## Visualizations
 
