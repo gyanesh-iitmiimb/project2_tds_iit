@@ -583,7 +583,7 @@ class DataAnalyzerMarkdown(DataAnalyzer):
         # Combine text with image data
         content = f"{text}\n\n{' '.join(images_base64)}"
 
-        content = content + " " +self.data_desc + " " + self.data_analysis + " " +self.data_insight
+        content = f"images:{content}" + " " +self.data_desc + " " + self.data_analysis + " " +self.data_insight
 
 
         # Use chat_completion to analyze implications
@@ -608,7 +608,6 @@ class DataAnalyzerMarkdown(DataAnalyzer):
             The base64 encoded string of the image.
         """
         with open(image_path, "rb") as image_file:
-            print(base64.b64encode(image_file.read()))
             return base64.b64encode(image_file.read()).decode("utf-8")
 
 

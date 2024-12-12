@@ -583,15 +583,21 @@ class DataAnalyzerMarkdown(DataAnalyzer):
         # Combine text with image data
         content = f"{text}\n\n{' '.join(images_base64)}"
 
-        content = content + " " +self.data_desc + " " + self.data_analysis + " " +self.data_insight
+        content = f"images:{content}" + " " +self.data_desc + " " + self.data_analysis + " " +self.data_insight
 
 
         # Use chat_completion to analyze implications
-        return self.chat_completion(
-            context="You are a data scientist. Analyze the given text and images to identify key implications."
-                    "Be crisp and deliver a short paragraph, try to contain under 300 words",
-            content=content
-        )
+        try:
+            return self.chat_completion(
+                context="You are a data scientist. Analyze the given text and images to identify key implications."
+                        "Be crisp and deliver a short paragraph, try to contain under 300 words",
+                content=content
+            )
+        except Exception as e:
+            return self.chat_completion(context="You are a data scientist. Analyze the given text and images to identify key implications."
+                        "Be crisp and deliver a short paragraph, try to contain under 300 words",
+                content=self.data_desc + " " + self.data_analysis + " " +self.data_insight
+            )
 
     def convert_image_to_base64(self, image_path):
         """
