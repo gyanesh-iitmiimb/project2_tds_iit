@@ -345,7 +345,7 @@ class DataAnalyzer:
             df = pd.DataFrame(StandardScaler().fit_transform(df), columns=df.columns)
             if  not os.path.exists(self.filename):
                 os.mkdir(self.filename)
-            plt.figure(figsize=(512/96, 512/96),dpi=96)
+            plt.figure(figsize=(350/96, 350/96),dpi=96)
             sns.scatterplot(x=max_1, y=max_2, data=df, color="red",alpha=0.5)
             sns.scatterplot(x=min_1, y=min_2, data=df, color="blue",alpha=0.5)
             plt.title("Correlation Graph For Scaled Variables")
@@ -367,7 +367,7 @@ class DataAnalyzer:
             df = self.df[top_3_keys]
             if  not os.path.exists(self.filename):
                 os.mkdir(self.filename)
-            df.plot(kind='box',subplots=True,figsize=(512/96, 512/96))
+            df.plot(kind='box',subplots=True,figsize=(350/96, 350/96))
             plt.title('Boxplots of Outliers')
             plt.tight_layout(pad=0)
             plt.savefig(os.path.join(self.filename, 'outlier_boxplots.png'), bbox_inches='tight', pad_inches=0,dpi=96)
@@ -383,7 +383,7 @@ class DataAnalyzer:
                 y = df['cluster']
                 X = pd.DataFrame(StandardScaler().fit_transform(X), columns=X.columns)
                 if len(X.columns) <= 3:
-                    plt.figure(figsize=(512 / 96, 512 / 96), dpi=96)
+                    plt.figure(figsize=(350 / 96, 350 / 96), dpi=96)
                     plt.scatter(X[important_feature1], X[important_feature2], c=y, cmap='tab20',alpha=0.4)
                     plt.xlabel(important_feature1)
                     plt.ylabel(important_feature2)
@@ -395,7 +395,7 @@ class DataAnalyzer:
                     lda = LinearDiscriminantAnalysis(n_components=2)
                     lda.fit(X, y)
                     X_lda = lda.transform(X)
-                    plt.figure(figsize=(512 / 96, 512 / 96), dpi=96)
+                    plt.figure(figsize=(350 / 96, 350 / 96), dpi=96)
                     plt.scatter(X_lda[:, 0], X_lda[:, 1], c=y, cmap='tab20',alpha=0.4)
                     plt.xlabel('Component 1')
                     plt.ylabel('Component 2')
@@ -412,7 +412,7 @@ class DataAnalyzer:
             df = self.df[[important_feature1,column_comparison]]
             df.loc[:, important_feature1] = df.loc[:, important_feature1].fillna(df.loc[:, important_feature1].mean())
             df.loc[:, column_comparison] = df.loc[:, column_comparison].fillna(df.loc[:, column_comparison].mode()[0])
-            plt.figure(figsize=(512 / 96, 512 / 96), dpi=96)
+            plt.figure(figsize=(350 / 96, 350 / 96), dpi=96)
             plt.tight_layout(pad=0)
             df.groupby(column_comparison).mean().plot(kind="bar")
             plt.savefig(os.path.join(self.filename, 'Column_Visualization_mean.png'), bbox_inches='tight', pad_inches=0,dpi=96)
@@ -424,7 +424,7 @@ class DataAnalyzer:
             df = self.df[[important_feature1,column_comparison]]
             df.loc[:, important_feature1] = df.loc[:, important_feature1].fillna(df.loc[:, important_feature1].mean())
             df.loc[:, column_comparison] = df.loc[:, column_comparison].fillna(df.loc[:, column_comparison].mode()[0])
-            plt.figure(figsize=(512 / 96, 512 / 96), dpi=96)
+            plt.figure(figsize=(350 / 96, 350 / 96), dpi=96)
             plt.tight_layout(pad=0)
             df.groupby(column_comparison).count().plot(kind="bar")
             plt.savefig(os.path.join(self.filename, 'Column_Visualization_count.png'), bbox_inches='tight', pad_inches=0,dpi=96)
@@ -578,10 +578,10 @@ class DataAnalyzerMarkdown(DataAnalyzer):
         image_paths = [os.path.join(self.filename,file) for file in os.listdir(self.filename) if file.endswith('.png')]
         # Convert images to base64 strings
         content = ""
-        #images_base64 = [self.convert_image_to_base64(image_path) for image_path in image_paths]
+        images_base64 = [self.convert_image_to_base64(image_path) for image_path in image_paths]
 
         # Combine text with image data
-        #content = f"{text}\n\n{' '.join(images_base64)}"
+        content = f"{text}\n\n{' '.join(images_base64)}"
 
         content = content + " " +self.data_desc + " " + self.data_analysis + " " +self.data_insight
 

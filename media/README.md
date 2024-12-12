@@ -2,7 +2,7 @@
 
 ## Data Description 
  
-The report contains a dataset with 2,652 entries that catalog information about various media titles, including their release date, language, type (e.g., movie), title, contributors, and ratings based on overall quality and repeatability. The data is structured to facilitate analysis of trends and preferences in different media within specified categories.
+The report consists of a dataset with 2,652 entries detailing various media content, including movies in different languages. Each entry includes attributes such as the date of release, language, type of media, title, contributors (such as actors), and ratings in overall, quality, and repeatability categories. The data appears to be structured for analysis of media performance and audience engagement.
  
 ## Numerical Columns
 
@@ -10,9 +10,9 @@ The maximum correlations is found between columns overall and quality with a val
 
 Outliers found in column {'overall': 1216, 'quality': 24}
 
-The most important features are quality, repeatability and overall with feature importances of importance    0.5066
-Name: quality, dtype: float64, importance    0.310879
-Name: repeatability, dtype: float64 and importance    0.182521
+The most important features are quality, repeatability and overall with feature importances of importance    0.508897
+Name: quality, dtype: float64, importance    0.310696
+Name: repeatability, dtype: float64 and importance    0.180407
 Name: overall, dtype: float64 respectively
 
 ## Text Columns
@@ -24,15 +24,15 @@ The number of unique elements in text columns are   Column Name  Number of Uniqu
 
 ## Data Analysis 
 
-The dataset reveals a strong correlation (0.83) between the columns "overall" and "quality," while a weaker correlation (0.31) exists between "repeatability" and "quality." Key features include "quality," "repeatability," and "overall." Outliers were identified in the "overall" and "quality" columns, along with unique elements in text columns: "type" (8 unique words), "language" (11 unique words), and "date" (2055 unique entries).
+The dataset reveals a strong correlation between the "overall" and "quality" columns (0.83), while the weakest correlation is between "repeatability" and "quality" (0.31). Key features identified are "quality," "repeatability," and "overall," with importances of 0.51, 0.31, and 0.18 respectively. Outliers were detected in both "overall" (1216) and "quality" (24), and the text columns have varying unique elements.
  
 ## Data Insights 
 
-The dataset showcases a robust relationship between overall ratings and quality, suggesting that higher quality media tends to receive better overall ratings. However, the modest correlation between repeatability and quality indicates that a title’s quality may not directly translate to it being rewatched. The diversity in languages and types also points to a rich variety of media, which could influence audience preferences and trends over time.
+The dataset's strong correlation between "overall" and "quality" suggests that improving content quality can significantly enhance audience ratings. However, the weak link between "repeatability" and "quality" indicates that high-quality content doesn't always lead to frequent re-watching, pointing to potential insights into viewer preferences and engagement strategies. Outlier detection may reveal unique media entries that could inform targeted marketing efforts or content recommendations.
  
 ## Data Implications 
 
-The analysis of the dataset comprising 2,652 media entries uncovers critical insights into audience engagement and quality perception in media content. A high correlation (0.83) between overall ratings and quality suggests that productions perceived as high-quality are more likely to receive favorable overall ratings, reinforcing the importance of quality in media creation. However, the weaker correlation (0.31) between repeatability and quality indicates that high-quality titles aren't necessarily revisited, implying that factors such as genre, storytelling, and viewer fatigue might influence rewatchability independently of quality. The dataset's diversity, reflected in the 11 unique languages and 8 media types, highlights the breadth of content available, which could cater to varied audience preferences and encourage niche viewership. Such diversity in release dates (2055 unique entries) suggests evolving trends in media consumption over time. Overall, the findings emphasize the critical role of quality in establishing a title's reception while pointing to the necessity for deeper exploration into the elements driving repeat engagement. These implications are vital for media producers aiming to enhance both the quality and the repeatability of their projects to maximize audience retention.
+The dataset comprising 2,652 entries concerning diverse media content highlights significant insights into the relationship between different attributes affecting audience engagement. Key findings reveal a strong correlation (0.83) between "overall" ratings and "quality," indicating that higher quality often translates to better overall audience ratings. Conversely, the weak correlation (0.31) between "repeatability" and "quality" suggests that even high-quality content may not incentivize viewers to re-watch, reflecting complex viewer preferences. Feature importance analysis shows "quality" as the most crucial factor (0.51), followed by "repeatability" (0.31) and "overall" ratings (0.18). Outliers in both "overall" (1216) and "quality" (24) ratings could be targeted for tailored marketing strategies. The varied unique text elements within the dataset open avenues for deeper qualitative analyses. Overall, these insights underscore the importance of prioritizing content quality to optimize viewer ratings and highlight opportunities for leveraging outliers in targeted engagement tactics.
 
 ## Visualizations
 

@@ -2,17 +2,17 @@
 
 ## Data Description 
  
-The report contains a dataset with information on books, including fields such as book IDs, ISBN numbers, ratings, and image URLs. It consists of 10,000 rows, encompassing various attributes related to each book's identity and popularity, including metrics for user ratings. This data can be used for analysis of book trends, reader preferences, and overall book popularity.
+The report contains a dataset with 10,000 rows related to books, featuring various attributes such as book IDs, ISBNs, and ratings. It includes counts of ratings across different star levels (2 to 5 stars), as well as links to images of the books. The data is structured in multiple columns to provide insights into book popularity and reader feedback.
  
 ## Numerical Columns
 
-The maximum correlations is found between columns ratings_count and work_ratings_count with a value of 0.9950949109767664.The minimum correlation is between columns ratings_2 and average_rating with a value of -0.11433083463802127
+The maximum correlations is found between columns work_ratings_count and ratings_count with a value of 0.9950949109767664.The minimum correlation is between columns average_rating and ratings_2 with a value of -0.11433083463802127
 
-Outliers found in column {'ratings_2': 1156, 'work_text_reviews_count': 1005, 'ratings_count': 1163, 'average_rating': 158, 'ratings_1': 1140, 'ratings_3': 1149, 'ratings_4': 1131, 'books_count': 844, 'ratings_5': 1158, 'isbn13': 556, 'work_ratings_count': 1143}
+Outliers found in column {'work_ratings_count': 1143, 'isbn13': 556, 'ratings_3': 1149, 'ratings_4': 1131, 'ratings_count': 1163, 'average_rating': 158, 'ratings_2': 1156, 'ratings_1': 1140, 'ratings_5': 1158, 'books_count': 844, 'work_text_reviews_count': 1005}
 
-The most important features are ratings_4, work_ratings_count and ratings_3 with feature importances of importance    0.494741
-Name: ratings_4, dtype: float64, importance    0.339257
-Name: work_ratings_count, dtype: float64 and importance    0.053983
+The most important features are ratings_4, work_ratings_count and ratings_3 with feature importances of importance    0.503429
+Name: ratings_4, dtype: float64, importance    0.328373
+Name: work_ratings_count, dtype: float64 and importance    0.048783
 Name: ratings_3, dtype: float64 respectively
 
 ## Text Columns
@@ -23,15 +23,17 @@ The number of unique elements in text columns are      Column Name  Number of Un
 
 ## Data Analysis 
 
-The dataset exhibits a strong correlation (0.995) between the columns ratings_count and work_ratings_count, while the weakest correlation (-0.114) occurs between ratings_2 and average_rating. Key features impacting the dataset include ratings_4, work_ratings_count, and ratings_3, with respective importances of 0.472, 0.332, and 0.079. Additionally, several outliers were identified across multiple rating-related columns, and the text column language_code contains 25 unique elements, while the isbn column has 9,300 unique values.
+The dataset reveals a strong correlation (0.995) between work_ratings_count and ratings_count, while the weakest correlation (-0.114) is between average_rating and ratings_2. Key features include ratings_4, work_ratings_count, and ratings_3. Additionally, several outliers are identified across multiple columns, and the text columns reveal 25 unique language codes and 9,300 unique ISBNs.
  
 ## Data Insights 
 
-The dataset reveals a powerful correlation between ratings_count and work_ratings_count, suggesting that these metrics are indicative of each other in assessing book popularity. Notably, while ratings_4 significantly influences overall ratings, the presence of outliers and diverse language codes underscore the complexity of reader preferences and market trends, signaling opportunities for targeted marketing strategies.
+The dataset provides a rich insight into book popularity, evidenced by the strong correlation between work ratings count and ratings count, suggesting that more frequently rated books tend to also be highly rated. However, the low correlation between average rating and 2-star ratings indicates that low ratings may not significantly impact overall book perception. The presence of 9,300 unique ISBNs highlights a diverse range, while the identification of outliers suggests opportunities for further investigation into exceptional books or rating behaviors.
  
 ## Data Implications 
 
-The dataset on books reveals significant insights into reader preferences and market trends. With 10,000 entries, the strong correlation (0.995) between ratings_count and work_ratings_count indicates that these metrics are key indicators of a book's popularity, suggesting that higher user engagement correlates with higher ratings. Key features influencing ratings include ratings_4, work_ratings_count, and ratings_3, with ratings_4 being the most impactful. However, the presence of outliers in rating-related columns hints at inconsistencies in reader assessments, indicating a need for further investigation into these anomalies. Moreover, the diversity in language codes (25 unique elements) and ISBN numbers (9,300 unique values) highlights the global reach and multifaceted nature of book readership. This complexity offers an opportunity for targeted marketing strategies based on specific reader demographics and preferences, allowing publishers and marketers to tailor their approaches effectively to enhance engagement and sales.
+The dataset comprising 10,000 book entries offers significant insights into reader preferences and ratings dynamics by encapsulating attributes like book IDs, ISBNs, and rating counts. Notably, a strong correlation (0.995) between work ratings count and total ratings hints at a trend where books that accumulate more ratings also achieve higher scores, indicating greater popularity. Conversely, the negligible correlation (-0.114) between average ratings and two-star ratings uncovers a disconnect, suggesting that a subset of poor ratings may not dramatically alter the book's perceived quality. This could reflect a resilience in some works where criticisms do not overshadow overall appreciation. 
+
+The dataset further highlights diversity with 25 language codes and 9,300 unique ISBNs. Identifying several outliers in ratings presents an avenue for deeper analysis into what distinguishes these books, whether due to unique content, thematic resonance, or reader engagement strategies. Such findings are vital for authors and publishers aiming to understand market dynamics and reader behavior, emphasizing the importance of reader ratings in shaping book reputation and sales potential.
 
 ## Visualizations
 
