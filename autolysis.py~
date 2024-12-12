@@ -29,66 +29,14 @@ import requests
 import json
 from dotenv import load_dotenv, find_dotenv
 import os
-#from langchain.chat_models import ChatOpenAI
-from langchain_openai.llms.base import OpenAI
-#from langchain.schema import HumanMessage, AIMessage, ChatMessage
 from datetime import datetime, timedelta
 import sys
-import seaborn.objects as so
-#AI_KEY = "eyJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6IjIyZjMwMDA1NDVAZHMuc3R1ZHkuaWl0bS5hYy5pbiJ9.Qai3zu_bZiRLCAqxq8XshNgFHDSFfLC0WIbaKiFdu_g"
+import base64
 load_dotenv(find_dotenv())
 endpoint = "https://aiproxy.sanand.workers.dev/openai/"
 api_key = os.getenv("OPENAI_API_KEY")
 api_base = endpoint + "v1/chat/completions"
-def get_flight_info(loc_origin, loc_destination):
-    """Get flight information between two locations."""
 
-    # Example output returned from an API or database
-    flight_info = {
-        "loc_origin": loc_origin,
-        "loc_destination": loc_destination,
-        "datetime": str(datetime.now() + timedelta(hours=2)),
-        "airline": "KLM",
-        "flight": "KL643",
-    }
-
-    return json.dumps(flight_info)
-
-
-function_descriptions = [
-    {
-        "name": "get_flight_info",
-        "description": "Get flight information between two locations",
-        "parameters": {
-            "type": "object",
-            "properties": {
-                "loc_origin": {
-                    "type": "string",
-                    "description": "The departure airport, e.g. DUS",
-                },
-                "loc_destination": {
-                    "type": "string",
-                    "description": "The destination airport, e.g. HAM",
-                },
-            },
-            "required": ["loc_origin", "loc_destination"],
-        },
-    }
-]
-"""def chat_completion(api_key,api_base):
-    headers = {"Content-Type": "application/json","Authorization": f"Bearer {api_key}"}
-    response = requests.post(api_base, headers=headers, data=json.dumps({"model": "gpt-4o-mini",
-                                                                         "messages": [{"role": "user", "content": "When's the next flight from Amsterdam to New York?"}],
-                                                                         "functions": function_descriptions,
-                                                                         "function_call": "auto"}))
-    response.raise_for_status()
-    return response.json()
-
-completion = chat_completion(api_key,api_base)
-output = completion.choices[0].message
-chosen_function = eval(output.function_call.name)
-flight = chosen_function(**params)
-print(completion)"""
 if len(sys.argv) != 2:
     print("Usage: python autolysis.py <file_path>")
     sys.exit(1)
@@ -130,7 +78,31 @@ class DataAnalyzer:
         self.text_cols = None
         self.filename = dataframe_path.split(".")[0]
         self.df = pd.read_csv(dataframe_path, encoding='utf-8', encoding_errors='ignore')
+
     def identify_link_or_word_columns(self):
+        """
+        Identify columns that contain links or words.
+
+        Columns that contain links are identified by the presence of URLs.
+        Columns that contain words are identified by the presence of at least one word
+        with more than 4 letters.
+
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        None
+
+        Notes
+        -----
+        This function updates the following instance variables:
+
+        - link_cols: a list of column names that contain links
+        - sentence_cols: a list of column names that contain sentences
+        - text_cols: a list of column names that contain text data
+        """
         link_cols = []
         sentence_cols = []
         text_cols = []
@@ -152,6 +124,28 @@ class DataAnalyzer:
 
 
     def identify_date_columns_and_create_timestamp(self):
+        """
+        Identify date columns and create a timestamp column.
+
+        Columns that contain date information are identified by the presence of
+        datetime objects in the column or by the presence of certain keywords in
+        the column name.
+
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        None
+
+        Notes
+        -----
+        This function updates the following instance variables:
+
+        - date_cols: a list of column names that contain date information
+        - timestamp: a datetime column created from the date columns
+        """
         date_cols = []
         for col in self.df.columns:
             try:
@@ -170,7 +164,23 @@ class DataAnalyzer:
         self.date_cols = date_cols
 
     def numerical_cols_analyze_correlations(self):
-        self.numeric_cols = set(self.df.select_dtypes(exclude=['object']).columns) - set(self.date_cols)- {'timestamp'}
+        """
+        Analyze the correlations between numerical columns.
+
+        The correlations between all numerical columns are calculated using
+        the Pearson correlation coefficient. The maximum and minimum correlations
+        are then returned.
+
+        Returns
+        -------
+        tuple:
+            A tuple containing the maximum and minimum correlations, as well as
+            the columns on which they are found.
+        """
+        if self.date_cols:
+            self.numeric_cols = set(self.df.select_dtypes(exclude=['object']).columns) - set(self.date_cols)- {'timestamp'}
+        else:
+            self.numeric_cols = set(self.df.select_dtypes(exclude=['object']).columns) - {'timestamp'}
         self.numeric_cols = list(self.numeric_cols)
         self.numeric_cols = [col for col in self.numeric_cols if "_id" not in col.lower()]
         try:
@@ -188,6 +198,19 @@ class DataAnalyzer:
             return ("No Relevant Numerical Column Found")
 
     def numerical_cols_analyze_outliers(self):
+        """
+        Analyze numerical columns for outliers.
+
+        This function calculates the interquartile range (IQR) for each numerical column
+        and identifies any data points that fall outside the IQR bounds as outliers.
+
+        Returns
+        -------
+        tuple:
+            A tuple containing a message indicating the presence of outliers and a dictionary
+            where keys are column names and values are the count of outliers in that column.
+            If no outliers are found, a message indicating no outliers is returned.
+        """
         try:
             outliers_dict = {}
             for col in self.numeric_cols:
@@ -207,6 +230,22 @@ class DataAnalyzer:
             return ("No Relevant Numerical Column Found")
 
     def numerical_cols_analyze_cluster(self):
+        """
+        Analyze numerical columns for clustering.
+
+        This function uses the k-means clustering algorithm to identify clusters
+        in the numerical columns. The silhouette score is used to evaluate the
+        quality of the clustering. The feature importances of the clusters are
+        then calculated using a random forest regressor and the most important
+        features are returned.
+
+        Returns
+        -------
+        tuple:
+            A tuple containing a message indicating the most important features
+            and a DataFrame containing the cluster labels. If no relevant numerical
+            columns are found, a message indicating no relevant columns is returned.
+        """
         try:
             df = self.df[self.numeric_cols]
             sil_score = []
@@ -237,6 +276,21 @@ class DataAnalyzer:
             return ("No Relevant Numerical Column Found")
 
     def text_word_analyzer(self):
+        """
+        Analyze text columns by counting the number of unique words in each column.
+
+        Parameters
+        ----------
+        None
+
+
+        Returns
+        -------
+        tuple:
+            A tuple containing a message and a DataFrame with the column names
+            and the number of unique words in each column. If no text columns are
+            found, a message indicating no text columns is returned.
+        """
         if self.text_cols:
             text_cols_nunique = {col:self.df[col].nunique() for col in self.text_cols}
             df= pd.DataFrame(text_cols_nunique.items(), columns=['Column Name', 'Number of Unique Words'])
@@ -246,9 +300,25 @@ class DataAnalyzer:
             return ("No Text Columns Found",[])
 
 
-
-
     def create_visualisations(self):
+        """
+        Creates visualizations of the data in the specified file path.
+
+        The following visualizations are created:
+        1. Correlation graph for scaled variables
+        2. Boxplots of outliers
+        3. Clusters in 2 dimensions
+        4. Column visualization of mean
+        5. Column visualization of count
+
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        None
+        """
         c=0
         if self.numerical_cols_analyze_correlations() != "No Relevant Numerical Column Found":
             max_1 = self.numerical_cols_analyze_correlations()[1]
@@ -343,90 +413,151 @@ class DataAnalyzer:
             df.groupby(column_comparison).count().plot(kind="bar")
             plt.savefig(os.path.join(self.filename, 'Column_Visualization_count.png'), bbox_inches='tight', pad_inches=0,dpi=96)
             c=c+1
+class DataAnalyzerMarkdown(DataAnalyzer):
+    """
+    Initialize a DataAnalyzerMarkdown instance.
+
+    Parameters
+    ----------
+    file_path : str
+        The path to the CSV file to be analyzed.
+    api_base : str
+        The base URL of the OpenAI API.
+    api_key : str
+        The OpenAI API key.
+
+    Attributes
+    ----------
+    md_filename : str
+        The path to the Markdown file to be written.
+    api_base : str
+        The base URL of the OpenAI API.
+    api_key : str
+        The OpenAI API key.
+    """
+    def __init__(self, file_path,api_base,api_key):
+        super().__init__(file_path)
+        self.md_filename = os.path.join(self.filename, 'README.md')
+        self.api_base = api_base
+        self.api_key = api_key
+        self.identify_date_columns_and_create_timestamp()
+        self.identify_link_or_word_columns()
+
+    def chat_completion(self, content, context):
+        """
+        Make a request to the OpenAI API to generate a completion based on the content and context.
+
+        Parameters
+        ----------
+        content : str
+            The content to be completed.
+        context : str
+            The context to be used for generating the completion.
+
+        Returns
+        -------
+        str
+            The generated completion.
+        """
+        headers = {"Content-Type": "application/json", "Authorization": f"Bearer {self.api_key}"}
+        response = requests.post(self.api_base, headers=headers,
+                                 data=json.dumps({"model": "gpt-4o-mini",
+                                                  "messages": [{"role":"system","content":f"{context}"},
+                                                      {"role": "user","content": f"{content}"}]}))
+        response.raise_for_status()
+        messages = response.json()
+
+        return messages["choices"][0]["message"]["content"]
+
+    def brief_data_description(self):
+        return self.chat_completion(context="Briefly describe the data in this report. Be precise in 2-3 sentences. Give a generalised answer the data passed is just an example subset"
+                                            f"be generic in your answer, as data contains {len(self.df)} rows",
+                                    content=f"{self.df.head(1)}")
+    def explain_data_analysis(self):
+        return self.chat_completion(context= "You are given few sentences about the data set, summarise those in 2 to 3 lines.",
+                                    content = (f"{self.numerical_cols_analyze_correlations()[0]} " +
+                                                        f"{self.numerical_cols_analyze_cluster()[0]} " +
+                                                        f"{self.numerical_cols_analyze_outliers()[0]} " +
+                                                        f"{self.text_word_analyzer()[0]}"))
+
+    def explain_data_insights(self):
+        return self.chat_completion(context= "You are a good data scientist, given few summaries of the data and data analysis. Generate dood insights"
+                                             "in about two to three lines",
+                                    content = (f"{self.brief_data_description()}" + " " + f"{self.explain_data_analysis()}" ))
+
+    def analyze_implications_with_images(self):
+        """
+        Analyze text and images to identify key implications.
+
+        Parameters
+        ----------
+        None
+        Returns
+        -------
+        str
+            The generated insights from the text and images.
+        """
+        text = ""
+        image_paths = [os.path.join(self.filename,file) for file in os.listdir(self.filename) if file.endswith('.png')]
+        # Convert images to base64 strings
+        images_base64 = [self.convert_image_to_base64(image_path) for image_path in image_paths]
+
+        # Combine text with image data
+        content = f"{text}\n\n{' '.join(images_base64)}"
+
+        # Use chat_completion to analyze implications
+        return self.chat_completion(
+            context="You are a data scientist. Analyze the given text and images to identify key implications.",
+            content=content
+        )
+
+    def convert_image_to_base64(self, image_path):
+        """
+        Convert an image file to a base64 encoded string.
+
+        Parameters
+        ----------
+        image_path : str
+            The path to the image file.
+
+        Returns
+        -------
+        str
+            The base64 encoded string of the image.
+        """
+        with open(image_path, "rb") as image_file:
+            return base64.b64encode(image_file.read()).decode("utf-8")
 
 
 
 
+    def write_report_md(self):
+        with open(self.md_filename, 'w') as f:
+            f.write('# Report\n\n')
+            f.write('## Data Description \n \n')
+            f.write(self.brief_data_description() + '\n \n')
+            f.write('## Numerical Columns\n\n')
+            f.write(self.numerical_cols_analyze_correlations() + '\n\n')
+            f.write(self.numerical_cols_analyze_outliers() + '\n\n')
+            f.write(self.numerical_cols_analyze_cluster() + '\n\n')
+            f.write('## Text Columns\n\n')
+            f.write(self.text_word_analyzer() + '\n\n')
+            f.write ('## Data Analysis \n\n')
+            f.write (self.explain_data_analysis() + '\n \n')
+            f.write ('## Data Insights \n\n')
+            f.write (self.explain_data_insights() + '\n \n')
+            f.write ('## Data Implications \n\n')
+            f.write (self.analyze_implications_with_images() + '\n\n')
+            f.write('## Visualizations\n\n')
+            image_files = [file for file in os.listdir(self.filename) if file.endswith('.png')]
+            for image_file in image_files:
+                image_path = os.path.join(self.filename, image_file)
+                if os.path.exists(image_path):
+                    f.write(f'![{image_file}]({image_path})\n\n')
+            f.write('\n')
+            f.close()
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-    def analyze_and_visualize(self):
-        # Numerical columns identification
-        self.numeric_cols = [col for col in self.df.columns if pd.api.types.is_numeric_dtype(self.df[col])]
-
-        # Text columns identification
-        self.text_cols = [col for col in self.df.columns if pd.api.types.is_string_dtype(self.df[col]) and col not in self.date_cols + self.link_cols + self.word_cols]
-
-        #Numerical columns analysis
-        for col in self.numeric_cols:
-            plt.figure(figsize=(8, 6))
-            sns.histplot(self.df[col], kde=True)
-            plt.title(f'Distribution of {col}')
-            plt.savefig(os.path.join(self.image_folder,f'{col}_histogram.png'), bbox_inches='tight', pad_inches=0.2)
-            plt.close()
-
-        #Date columns analysis
-        if self.date_cols:
-          for col in self.date_cols:
-              plt.figure(figsize=(8, 6))
-              self.df[col].value_counts().plot(kind='bar')
-              plt.title(f'Counts for {col}')
-              plt.savefig(os.path.join(self.image_folder, f'{col}_counts.png'), bbox_inches='tight', pad_inches=0.2)
-              plt.close()
-
-          plt.figure(figsize=(8, 6))
-          if 'timestamp' in self.df:
-              sns.lineplot(x=self.df['timestamp'], y=self.df[self.numeric_cols[0]] if self.numeric_cols else self.df.index) #fallback if no numeric cols
-              plt.title('Time series plot')
-              plt.savefig(os.path.join(self.image_folder, 'time_series.png'), bbox_inches='tight', pad_inches=0.2)
-              plt.close()
-
-        # Text columns analysis
-        for col in self.text_cols:
-            plt.figure(figsize=(8, 6))
-            self.df[col].value_counts().plot(kind='bar')
-            plt.title(f"Count of unique text values in {col}")
-            plt.savefig(os.path.join(self.image_folder, f'{col}_text_counts.png'), bbox_inches='tight', pad_inches=0.2)
-            plt.close()
-
-    def highlight_key_stories(self):
-        key_stories = []
-
-        for col in self.numeric_cols:
-            if self.df[col].mean() > 10:
-                key_stories.append(f"High average values in '{col}' column. Investigate outliers")
-
-        if self.date_cols:
-            for col in self.date_cols:
-                if not self.df.empty and 'timestamp' in self.df:
-                  counts_by_date = self.df.groupby(pd.Grouper(key='timestamp', freq='W'))['timestamp'].count()
-                  peak_week = counts_by_date.idxmax()
-                  key_stories.append(f"Peak activity in '{col}' column occurred around week of {peak_week}")
-
-        for col in self.link_cols:
-          if self.df[col].str.contains("google.com").any():
-            key_stories.append(f"Google links detected in '{col}' column")
-
-        for col in self.word_cols:
-            frequent_words = self.df[col].str.split().explode().value_counts().head(3)
-            key_stories.append(f"Frequent words in '{col}': {frequent_words.to_dict()}")
-
-        for col in self.text_cols:
-            common_phrases = self.df[col].value_counts().head(2)
-            key_stories.append(f"Common phrases or text values in '{col}': {common_phrases.to_dict()}")
-
-        return key_stories
 
 df = DataAnalyzer(file_path)
 df.identify_link_or_word_columns()
@@ -436,3 +567,7 @@ df.numerical_cols_analyze_outliers()
 df.numerical_cols_analyze_cluster()
 df.text_word_analyzer()
 df.create_visualisations()
+md = DataAnalyzerMarkdown(file_path = file_path,api_base =api_base, api_key=api_key)
+md.write_report_md()
+
+

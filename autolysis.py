@@ -31,59 +31,12 @@ from dotenv import load_dotenv, find_dotenv
 import os
 from datetime import datetime, timedelta
 import sys
+import base64
 load_dotenv(find_dotenv())
 endpoint = "https://aiproxy.sanand.workers.dev/openai/"
 api_key = os.getenv("OPENAI_API_KEY")
 api_base = endpoint + "v1/chat/completions"
-def get_flight_info(loc_origin, loc_destination):
-    """Get flight information between two locations."""
 
-    # Example output returned from an API or database
-    flight_info = {
-        "loc_origin": loc_origin,
-        "loc_destination": loc_destination,
-        "datetime": str(datetime.now() + timedelta(hours=2)),
-        "airline": "KLM",
-        "flight": "KL643",
-    }
-
-    return json.dumps(flight_info)
-
-
-function_descriptions = [
-    {
-        "name": "get_flight_info",
-        "description": "Get flight information between two locations",
-        "parameters": {
-            "type": "object",
-            "properties": {
-                "loc_origin": {
-                    "type": "string",
-                    "description": "The departure airport, e.g. DUS",
-                },
-                "loc_destination": {
-                    "type": "string",
-                    "description": "The destination airport, e.g. HAM",
-                },
-            },
-            "required": ["loc_origin", "loc_destination"],
-        },
-    }
-]
-"""def chat_completion(api_key,api_base):
-    headers = {"Content-Type": "application/json","Authorization": f"Bearer {api_key}"}
-    response = requests.post(api_base, headers=headers, data=json.dumps({"model": "gpt-4o-mini",
-                                                                         "messages": [{"role": "user", "content": "When's the next flight from Amsterdam to New York?"}],
-                                                                         "functions": function_descriptions,
-                                                                         "function_call": "auto"}))
-    response.raise_for_status()
-    return response.json()
-
-completion = chat_completion(api_key,api_base)
-output = completion.choices[0].message
-chosen_function = eval(output.function_call.name)
-flight = chosen_function(**params)
-print(completion)"""
 if len(sys.argv) != 2:
     print("Usage: python autolysis.py <file_path>")
     sys.exit(1)
@@ -224,7 +177,10 @@ class DataAnalyzer:
             A tuple containing the maximum and minimum correlations, as well as
             the columns on which they are found.
         """
-        self.numeric_cols = set(self.df.select_dtypes(exclude=['object']).columns) - set(self.date_cols)- {'timestamp'}
+        if self.date_cols:
+            self.numeric_cols = set(self.df.select_dtypes(exclude=['object']).columns) - set(self.date_cols)- {'timestamp'}
+        else:
+            self.numeric_cols = set(self.df.select_dtypes(exclude=['object']).columns) - {'timestamp'}
         self.numeric_cols = list(self.numeric_cols)
         self.numeric_cols = [col for col in self.numeric_cols if "_id" not in col.lower()]
         try:
@@ -274,6 +230,22 @@ class DataAnalyzer:
             return ("No Relevant Numerical Column Found")
 
     def numerical_cols_analyze_cluster(self):
+        """
+        Analyze numerical columns for clustering.
+
+        This function uses the k-means clustering algorithm to identify clusters
+        in the numerical columns. The silhouette score is used to evaluate the
+        quality of the clustering. The feature importances of the clusters are
+        then calculated using a random forest regressor and the most important
+        features are returned.
+
+        Returns
+        -------
+        tuple:
+            A tuple containing a message indicating the most important features
+            and a DataFrame containing the cluster labels. If no relevant numerical
+            columns are found, a message indicating no relevant columns is returned.
+        """
         try:
             df = self.df[self.numeric_cols]
             sil_score = []
@@ -304,6 +276,21 @@ class DataAnalyzer:
             return ("No Relevant Numerical Column Found")
 
     def text_word_analyzer(self):
+        """
+        Analyze text columns by counting the number of unique words in each column.
+
+        Parameters
+        ----------
+        None
+
+
+        Returns
+        -------
+        tuple:
+            A tuple containing a message and a DataFrame with the column names
+            and the number of unique words in each column. If no text columns are
+            found, a message indicating no text columns is returned.
+        """
         if self.text_cols:
             text_cols_nunique = {col:self.df[col].nunique() for col in self.text_cols}
             df= pd.DataFrame(text_cols_nunique.items(), columns=['Column Name', 'Number of Unique Words'])
@@ -314,6 +301,24 @@ class DataAnalyzer:
 
 
     def create_visualisations(self):
+        """
+        Creates visualizations of the data in the specified file path.
+
+        The following visualizations are created:
+        1. Correlation graph for scaled variables
+        2. Boxplots of outliers
+        3. Clusters in 2 dimensions
+        4. Column visualization of mean
+        5. Column visualization of count
+
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        None
+        """
         c=0
         if self.numerical_cols_analyze_correlations() != "No Relevant Numerical Column Found":
             max_1 = self.numerical_cols_analyze_correlations()[1]
@@ -408,6 +413,150 @@ class DataAnalyzer:
             df.groupby(column_comparison).count().plot(kind="bar")
             plt.savefig(os.path.join(self.filename, 'Column_Visualization_count.png'), bbox_inches='tight', pad_inches=0,dpi=96)
             c=c+1
+class DataAnalyzerMarkdown(DataAnalyzer):
+    """
+    Initialize a DataAnalyzerMarkdown instance.
+
+    Parameters
+    ----------
+    file_path : str
+        The path to the CSV file to be analyzed.
+    api_base : str
+        The base URL of the OpenAI API.
+    api_key : str
+        The OpenAI API key.
+
+    Attributes
+    ----------
+    md_filename : str
+        The path to the Markdown file to be written.
+    api_base : str
+        The base URL of the OpenAI API.
+    api_key : str
+        The OpenAI API key.
+    """
+    def __init__(self, file_path,api_base,api_key):
+        super().__init__(file_path)
+        self.md_filename = os.path.join(self.filename, 'README.md')
+        self.api_base = api_base
+        self.api_key = api_key
+        self.identify_date_columns_and_create_timestamp()
+        self.identify_link_or_word_columns()
+
+    def chat_completion(self, content, context):
+        """
+        Make a request to the OpenAI API to generate a completion based on the content and context.
+
+        Parameters
+        ----------
+        content : str
+            The content to be completed.
+        context : str
+            The context to be used for generating the completion.
+
+        Returns
+        -------
+        str
+            The generated completion.
+        """
+        headers = {"Content-Type": "application/json", "Authorization": f"Bearer {self.api_key}"}
+        response = requests.post(self.api_base, headers=headers,
+                                 data=json.dumps({"model": "gpt-4o-mini",
+                                                  "messages": [{"role":"system","content":f"{context}"},
+                                                      {"role": "user","content": f"{content}"}]}))
+        response.raise_for_status()
+        messages = response.json()
+
+        return messages["choices"][0]["message"]["content"]
+
+    def brief_data_description(self):
+        return self.chat_completion(context="Briefly describe the data in this report. Be precise in 2-3 sentences. Give a generalised answer the data passed is just an example subset"
+                                            f"be generic in your answer, as data contains {len(self.df)} rows",
+                                    content=f"{self.df.head(1)}")
+    def explain_data_analysis(self):
+        return self.chat_completion(context= "You are given few sentences about the data set, summarise those in 2 to 3 lines.",
+                                    content = (f"{self.numerical_cols_analyze_correlations()[0]} " +
+                                                        f"{self.numerical_cols_analyze_cluster()[0]} " +
+                                                        f"{self.numerical_cols_analyze_outliers()[0]} " +
+                                                        f"{self.text_word_analyzer()[0]}"))
+
+    def explain_data_insights(self):
+        return self.chat_completion(context= "You are a good data scientist, given few summaries of the data and data analysis. Generate dood insights"
+                                             "in about two to three lines",
+                                    content = (f"{self.brief_data_description()}" + " " + f"{self.explain_data_analysis()}" ))
+
+    def analyze_implications_with_images(self):
+        """
+        Analyze text and images to identify key implications.
+
+        Parameters
+        ----------
+        None
+        Returns
+        -------
+        str
+            The generated insights from the text and images.
+        """
+        text = ""
+        image_paths = [os.path.join(self.filename,file) for file in os.listdir(self.filename) if file.endswith('.png')]
+        # Convert images to base64 strings
+        images_base64 = [self.convert_image_to_base64(image_path) for image_path in image_paths]
+
+        # Combine text with image data
+        content = f"{text}\n\n{' '.join(images_base64)}"
+
+        # Use chat_completion to analyze implications
+        return self.chat_completion(
+            context="You are a data scientist. Analyze the given text and images to identify key implications.",
+            content=content
+        )
+
+    def convert_image_to_base64(self, image_path):
+        """
+        Convert an image file to a base64 encoded string.
+
+        Parameters
+        ----------
+        image_path : str
+            The path to the image file.
+
+        Returns
+        -------
+        str
+            The base64 encoded string of the image.
+        """
+        with open(image_path, "rb") as image_file:
+            return base64.b64encode(image_file.read()).decode("utf-8")
+
+
+
+
+    def write_report_md(self):
+        with open(self.md_filename, 'w') as f:
+            f.write('# Report\n\n')
+            f.write('## Data Description \n \n')
+            f.write(self.brief_data_description() + '\n \n')
+            f.write('## Numerical Columns\n\n')
+            f.write(self.numerical_cols_analyze_correlations()[0] + '\n\n')
+            f.write(self.numerical_cols_analyze_outliers()[0] + '\n\n')
+            f.write(self.numerical_cols_analyze_cluster()[0] + '\n\n')
+            f.write('## Text Columns\n\n')
+            f.write(self.text_word_analyzer()[0] + '\n\n')
+            f.write ('## Data Analysis \n\n')
+            f.write (self.explain_data_analysis() + '\n \n')
+            f.write ('## Data Insights \n\n')
+            f.write (self.explain_data_insights() + '\n \n')
+            f.write ('## Data Implications \n\n')
+            f.write (self.analyze_implications_with_images() + '\n\n')
+            f.write('## Visualizations\n\n')
+            image_files = [file for file in os.listdir(self.filename) if file.endswith('.png')]
+            for image_file in image_files:
+                image_path = os.path.join(self.filename, image_file)
+                if os.path.exists(image_path):
+                    f.write(f'![{image_file}]({image_path})\n\n')
+            f.write('\n')
+            f.close()
+
 
 
 df = DataAnalyzer(file_path)
@@ -418,3 +567,7 @@ df.numerical_cols_analyze_outliers()
 df.numerical_cols_analyze_cluster()
 df.text_word_analyzer()
 df.create_visualisations()
+md = DataAnalyzerMarkdown(file_path = file_path,api_base =api_base, api_key=api_key)
+md.write_report_md()
+
+
