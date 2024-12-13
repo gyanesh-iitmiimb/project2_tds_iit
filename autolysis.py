@@ -9,7 +9,8 @@
 #   "matplotlib",
 #   "numpy",
 #   "scikit-learn",
-#   "regex"
+#   "regex",
+#   "python-signal"
 # ]
 # ///
 import pandas as pd
@@ -19,7 +20,7 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.impute import SimpleImputer
 from sklearn.cluster import KMeans
 from sklearn.metrics import silhouette_score
-from sklearn.ensemble import RandomForestRegressor
+from sklearn.ensemble import RandomForestClassifier
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 import warnings
 warnings.simplefilter(action='ignore', category=UserWarning)
@@ -286,7 +287,7 @@ class DataAnalyzer:
             df['cluster'] = labels
             y=df['cluster']
             x=df[self.numeric_cols]
-            rf= RandomForestRegressor()
+            rf= RandomForestClassifier(n_estimators=30, random_state=42)
             rf.fit(x,y)
             feature_importances = pd.DataFrame(rf.feature_importances_, index=x.columns, columns=['importance']).sort_values('importance', ascending=False)
             self.important_feature1 = feature_importances.index[0]
@@ -667,6 +668,7 @@ class DataAnalyzerMarkdown(DataAnalyzer):
 
         # Use chat_completion to analyze implications
         try:
+            signal.alarm(80)
             return self.chat_completion(
                 context="You are a data scientist. Analyze the given text and images to identify key implications."
                         "Be crisp and deliver a short paragraph, try to contain under 300 words",
@@ -677,6 +679,8 @@ class DataAnalyzerMarkdown(DataAnalyzer):
                         "Be crisp and deliver a short paragraph, try to contain under 300 words",
                 content=self.data_desc + " " + self.data_analysis + " " +self.data_insight
             )
+        finally:
+            signal.alarm(0)
 
     def convert_image_to_base64(self, image_path):
         """
