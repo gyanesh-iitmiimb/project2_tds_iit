@@ -33,6 +33,7 @@ import sys
 import base64
 
 
+
 class DataAnalyzer:
     """
     DataAnalyzer is a class for analyzing CSV files and generating insights and visualizations.
@@ -57,6 +58,7 @@ class DataAnalyzer:
     df : pandas.DataFrame
         The DataFrame object of the CSV file.
     """
+
     def __init__(self, dataframe_path=None):
         """
         Initialize a DataAnalyzer instance.
@@ -91,6 +93,9 @@ class DataAnalyzer:
         self.text_cols = None
         self.filename = dataframe_path.split(".")[0]
         self.df = pd.read_csv(dataframe_path, encoding='utf-8', encoding_errors='ignore')
+        self.important_feature1 = None
+        self.important_feature2 = None
+        self.important_feature3 = None
 
     def identify_link_or_word_columns(self):
         """
@@ -116,6 +121,7 @@ class DataAnalyzer:
         - sentence_cols: a list of column names that contain sentences
         - text_cols: a list of column names that contain text data
         """
+        pass
         link_cols = []
         sentence_cols = []
         text_cols = []
@@ -159,6 +165,7 @@ class DataAnalyzer:
         - date_cols: a list of column names that contain date information
         - timestamp: a datetime column created from the date columns
         """
+        pass
         date_cols = []
         for col in self.df.columns:
             try:
@@ -190,6 +197,7 @@ class DataAnalyzer:
             A tuple containing the maximum and minimum correlations, as well as
             the columns on which they are found.
         """
+        pass
         if self.date_cols:
             self.numeric_cols = set(self.df.select_dtypes(exclude=['object']).columns) - set(self.date_cols)- {'timestamp'}
         else:
@@ -224,6 +232,7 @@ class DataAnalyzer:
             where keys are column names and values are the count of outliers in that column.
             If no outliers are found, a message indicating no outliers is returned.
         """
+        pass
         try:
             outliers_dict = {}
             for col in self.numeric_cols:
@@ -261,7 +270,6 @@ class DataAnalyzer:
         """
         try:
             df = self.df[self.numeric_cols]
-            sil_score = []
             max_score = 0
             max_cluster_num = 0
             df = pd.DataFrame(SimpleImputer().fit_transform(df), columns=df.columns)
@@ -281,9 +289,11 @@ class DataAnalyzer:
             rf= RandomForestRegressor()
             rf.fit(x,y)
             feature_importances = pd.DataFrame(rf.feature_importances_, index=x.columns, columns=['importance']).sort_values('importance', ascending=False)
+            self.important_feature1 = feature_importances.index[0]
+            self.important_feature2 = feature_importances.index[1]
             return (f"The most important features are {feature_importances.index[0]}, {feature_importances.index[1]} and {feature_importances.index[2]} with "
                     f"feature importances of {feature_importances.iloc[0]}, {feature_importances.iloc[1]} and {feature_importances.iloc[2]} respectively",
-                    df,feature_importances.index[0],feature_importances.index[1])
+                    df)
         except Exception as e:
             return ("No Relevant Numerical Column Found")
 
@@ -311,17 +321,11 @@ class DataAnalyzer:
         else:
             return ("No Text Columns Found",[])
 
-
-    def create_visualisations(self):
+    def create_correlation_plot(self):
         """
-        Creates visualizations of the data in the specified file path.
+        Creates correlations for the data in the specified file path.
 
-        The following visualizations are created:
-        1. Correlation graph for scaled variables
-        2. Boxplots of outliers
-        3. Clusters in 2 dimensions
-        4. Column visualization of mean
-        5. Column visualization of count
+        The plots is saved in the specified file path.
 
         Parameters
         ----------
@@ -331,7 +335,6 @@ class DataAnalyzer:
         -------
         None
         """
-        c=0
         if self.numerical_cols_analyze_correlations() != "No Relevant Numerical Column Found":
             max_1 = self.numerical_cols_analyze_correlations()[1]
             max_2 = self.numerical_cols_analyze_correlations()[2]
@@ -339,42 +342,75 @@ class DataAnalyzer:
             min_2 = self.numerical_cols_analyze_correlations()[4]
             df = self.df[self.numeric_cols]
             df = pd.DataFrame(StandardScaler().fit_transform(df), columns=df.columns)
-            if  not os.path.exists(self.filename):
+            if not os.path.exists(self.filename):
                 os.mkdir(self.filename)
-            plt.figure(figsize=(350/96, 350/96),dpi=96)
-            sns.scatterplot(x=max_1, y=max_2, data=df, color="red",alpha=0.5)
-            sns.scatterplot(x=min_1, y=min_2, data=df, color="blue",alpha=0.5)
+            plt.figure(figsize=(350 / 96, 350 / 96), dpi=96)
+            sns.scatterplot(x=max_1, y=max_2, data=df, color="red", alpha=0.5)
+            sns.scatterplot(x=min_1, y=min_2, data=df, color="blue", alpha=0.5)
             plt.title("Correlation Graph For Scaled Variables")
             plt.xlabel("X")
             plt.ylabel("Y")
             plt.tight_layout(pad=0)
-            plt.legend([f"Maximum Correlation between {max_1} and {max_2}", f"Minimum Correlation between {min_1} and {min_2}"],
+            plt.legend([f"Maximum Correlation between {max_1} and {max_2}",
+                        f"Minimum Correlation between {min_1} and {min_2}"],
                        fontsize=6)
-            plt.savefig(f"{self.filename}/correlation_graph.png",dpi=96,bbox_inches='tight',pad_inches=0)
-            c=c+1
+            plt.savefig(f"{self.filename}/correlation_graph.png", dpi=96, bbox_inches='tight', pad_inches=0)
 
+    def create_boxplots(self):
+        """
+        Creates boxplots for the data in the specified file path.
+
+        The plots are saved in the specified file path.
+
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        None
+        """
         if (self.numerical_cols_analyze_outliers() != "No Relevant Numerical Column Found") and (
-            self.numerical_cols_analyze_outliers() != "No Outliers Found"):
+                self.numerical_cols_analyze_outliers() != "No Outliers Found"):
             outliers_dict = self.numerical_cols_analyze_outliers()[1]
-            if len(outliers_dict)>=3:
+            if len(outliers_dict) >= 3:
                 top_3_keys = sorted(outliers_dict, key=outliers_dict.get, reverse=True)[:3]
             else:
                 top_3_keys = outliers_dict.keys()
             df = self.df[top_3_keys]
-            if  not os.path.exists(self.filename):
+            if not os.path.exists(self.filename):
                 os.mkdir(self.filename)
-            df.plot(kind='box',subplots=True,figsize=(350/96, 350/96))
+            df.plot(kind='box', subplots=True, figsize=(350 / 96, 350 / 96))
             plt.title('Boxplots of Outliers')
             plt.tight_layout(pad=0)
-            plt.savefig(os.path.join(self.filename, 'outlier_boxplots.png'), bbox_inches='tight', pad_inches=0,dpi=96)
-            c=c+1
+            plt.savefig(os.path.join(self.filename, 'outlier_boxplots.png'), bbox_inches='tight', pad_inches=0, dpi=96)
+
+    def cluster_visualizer(self):
+        """
+        Creates a scatter plot of clusters in 2 dimensions.
+
+        The clusters are obtained by performing k-means clustering on the data
+        in the specified file path. The clusters are then visualized in 2
+        dimensions by using either a linear discriminant analysis (LDA) or by
+        plotting the two most important features.
+
+        The plot is saved in the specified file path.
+
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        None
+        """
         if self.numerical_cols_analyze_cluster() != "No Relevant Numerical Column Found":
             try:
                 if  not os.path.exists(self.filename):
                     os.mkdir(self.filename)
                 df = self.numerical_cols_analyze_cluster()[1]
-                important_feature1 = self.numerical_cols_analyze_cluster()[2]
-                important_feature2 = self.numerical_cols_analyze_cluster()[3]
+                important_feature1 = self.important_feature1
+                important_feature2 = self.important_feature2
                 X = df[self.numeric_cols]
                 y = df['cluster']
                 X = pd.DataFrame(StandardScaler().fit_transform(X), columns=X.columns)
@@ -386,7 +422,7 @@ class DataAnalyzer:
                     plt.title('Visualizing Clusters in 2 Dimensions')
                     plt.tight_layout(pad=0)
                     plt.savefig(os.path.join(self.filename, 'Cluster_visualization.png'), bbox_inches='tight', pad_inches=0,dpi=96)
-                    c=c+1
+
                 else:
                     lda = LinearDiscriminantAnalysis(n_components=2)
                     lda.fit(X, y)
@@ -398,12 +434,30 @@ class DataAnalyzer:
                     plt.title('Visualizing Clusters in 2 Dimensions')
                     plt.tight_layout(pad=0)
                     plt.savefig(os.path.join(self.filename, 'Cluster_visualization.png'), bbox_inches='tight', pad_inches=0,dpi=96)
-                    c=c+1
+
             except Exception as e:
                 print ("No Relevant Clustering Analysis can be done on less than 2 numerical columns")
 
-        if self.text_word_analyzer()[1]:
-            important_feature1 = self.numerical_cols_analyze_cluster()[2]
+    def text_word_analyzer_plot_mean(self):
+        """
+        Plot the mean of a numerical column grouped by a categorical column.
+
+        The categorical column is the one with the most number of unique words,
+        and the numerical column is the one with the highest correlation with
+        the categorical column.
+
+        The plot is saved in the specified file path.
+
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        None
+        """
+        if self.text_word_analyzer()[1] and self.important_feature1:
+            important_feature1 = self.important_feature1
             column_comparison = self.text_word_analyzer()[1]
             df = self.df[[important_feature1,column_comparison]]
             df.loc[:, important_feature1] = df.loc[:, important_feature1].fillna(df.loc[:, important_feature1].mean())
@@ -412,10 +466,27 @@ class DataAnalyzer:
             plt.tight_layout(pad=0)
             df.groupby(column_comparison).mean().plot(kind="bar")
             plt.savefig(os.path.join(self.filename, 'Column_Visualization_mean.png'), bbox_inches='tight', pad_inches=0,dpi=96)
-            c=c+1
 
-        if self.text_word_analyzer()[1]:
-            important_feature1 = self.numerical_cols_analyze_cluster()[2]
+    def text_word_analyzer_plot_count(self):
+        """
+        Plot the count of a numerical column grouped by a categorical column.
+
+        The categorical column is the one with the most number of unique words,
+        and the numerical column is the one with the highest correlation with
+        the categorical column.
+
+        The plot is saved in the specified file path.
+
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        None
+        """
+        if self.text_word_analyzer()[1] and self.important_feature1:
+            important_feature1 = self.important_feature1
             column_comparison = self.text_word_analyzer()[1]
             df = self.df[[important_feature1,column_comparison]]
             df.loc[:, important_feature1] = df.loc[:, important_feature1].fillna(df.loc[:, important_feature1].mean())
@@ -424,7 +495,10 @@ class DataAnalyzer:
             plt.tight_layout(pad=0)
             df.groupby(column_comparison).count().plot(kind="bar")
             plt.savefig(os.path.join(self.filename, 'Column_Visualization_count.png'), bbox_inches='tight', pad_inches=0,dpi=96)
-            c=c+1
+
+
+
+
 class DataAnalyzerMarkdown(DataAnalyzer):
     """
     Initialize a DataAnalyzerMarkdown instance.
@@ -475,6 +549,15 @@ class DataAnalyzerMarkdown(DataAnalyzer):
         self.api_key = api_key
         self.identify_date_columns_and_create_timestamp()
         self.identify_link_or_word_columns()
+        self.corr = self.numerical_cols_analyze_correlations()[0]
+        self.outliers = self.numerical_cols_analyze_outliers()[0]
+        self.cluster = self.numerical_cols_analyze_cluster()[0]
+        self.word_analyzer = self.text_word_analyzer()[0]
+        self.create_correlation_plot()
+        self.create_boxplots()
+        self.cluster_visualizer()
+        self.text_word_analyzer_plot_mean()
+        self.text_word_analyzer_plot_count()
 
     def chat_completion(self, content, context):
         """
@@ -534,10 +617,10 @@ class DataAnalyzerMarkdown(DataAnalyzer):
             A summary of the data analysis in 2-3 lines.
         """
         self.data_analysis = self.chat_completion(context= "You are given few sentences about the data set, summarise those in 2 to 3 lines.",
-                                    content = (f"{self.numerical_cols_analyze_correlations()[0]} " +
-                                                        f"{self.numerical_cols_analyze_cluster()[0]} " +
-                                                        f"{self.numerical_cols_analyze_outliers()[0]} " +
-                                                        f"{self.text_word_analyzer()[0]}"))
+                                    content = (f"{self.corr} " +
+                                                        f"{self.cluster} " +
+                                                        f"{self.outliers} " +
+                                                        f"{self.word_analyzer}"))
         return self.data_analysis
 
     def explain_data_insights(self):
@@ -632,11 +715,11 @@ class DataAnalyzerMarkdown(DataAnalyzer):
             f.write('## Data Description \n \n')
             f.write(self.brief_data_description() + '\n \n')
             f.write('## Numerical Columns\n\n')
-            f.write(self.numerical_cols_analyze_correlations()[0] + '\n\n')
-            f.write(self.numerical_cols_analyze_outliers()[0] + '\n\n')
-            f.write(self.numerical_cols_analyze_cluster()[0] + '\n\n')
+            f.write(self.corr + '\n\n')
+            f.write(self.outliers + '\n\n')
+            f.write(self.cluster + '\n\n')
             f.write('## Text Columns\n\n')
-            f.write(self.text_word_analyzer()[0] + '\n\n')
+            f.write(self.word_analyzer + '\n\n')
             f.write ('## Data Analysis \n\n')
             f.write (self.explain_data_analysis() + '\n \n')
             f.write ('## Data Insights \n\n')
@@ -660,13 +743,5 @@ if len(sys.argv) != 2:
     print("Usage: python autolysis.py <file_path>")
     sys.exit(1)
 file_path = sys.argv[1]
-df = DataAnalyzer(file_path)
-df.identify_link_or_word_columns()
-df.identify_date_columns_and_create_timestamp()
-df.numerical_cols_analyze_correlations()
-df.numerical_cols_analyze_outliers()
-df.numerical_cols_analyze_cluster()
-df.text_word_analyzer()
-df.create_visualisations()
 md = DataAnalyzerMarkdown(file_path = file_path,api_base =api_base, api_key=api_key)
 md.write_report_md()
